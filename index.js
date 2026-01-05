@@ -5,11 +5,15 @@ const cors = require('cors')
 const authController = require('./controllers/authController')
 const blogController = require('./controllers/blogController')
 const multer = require('multer')
+const fs = require("fs");
+const path = require("path");
 
 // to store the cokkies when the user logedin to store their data
 const app = express()
 const port = process.env.PORT 
+
 //connect db
+// can query non mentioned field in schema and return undefined if not exist 
 mongoose.set('strictQuery', false);
 mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('MongoDB has started successfully'))
@@ -23,6 +27,19 @@ app.use(express.urlencoded({extended: true}))
 app.use('/auth', authController)
 app.use('/blog', blogController)
 // multer
+
+const uploadDir = path.join(__dirname, "uploads");
+
+const imageDir = path.join(__dirname, "public/images");
+
+app.get('/health', (req, res) => {
+  res.status(200).send('ok');
+});
+
+
+if (!fs.existsSync(imageDir)) {
+  fs.mkdirSync(imageDir, { recursive: true });
+}
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
         cb(null, 'public/images')
@@ -30,6 +47,7 @@ const storage = multer.diskStorage({
     filename: function(req, file, cb){
         cb(null, req.body.filename)
     }   })
+    // crete an uploader middleware
 const upload = multer({
     storage: storage
 })
@@ -38,4 +56,4 @@ app.post('/upload', upload.single("image"), async(req, res) => {
 })
 
 // connect server
-app.listen(port, () => console.log('Server has been started successfully'))
+app.listen(port, () => console.log('Server has been started successfully', port))

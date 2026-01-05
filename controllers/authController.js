@@ -20,6 +20,7 @@ authController.post('/register', async (req, res) => {
         const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET, {expiresIn: '5h'})
         return res.status(201).json({user: others, token,  success: true,message: "registered successfully"})
     } catch (error) {
+        console.log("error",error)
         return res.status(500).json({"error:":error,  success: false, message: 'error in registeration from server'})
     }
 })
@@ -29,13 +30,14 @@ authController.post('/login', async (req, res) => {
         if(!user){
             throw new Error("Invalid credentials")
         }
+        console.log("password", req.body.password)
         const comparePass = await bcrypt.compare(req.body.password, user.password)
         if(!comparePass){
             throw new Error("Invalid credentials")
         }
 
         const {password, ...others} = user._doc
-        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '5h'})        
+        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET , {expiresIn: '5h'})        
 
         return res.status(200).json({user: others, token})
     } catch (error) {

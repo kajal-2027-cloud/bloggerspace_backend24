@@ -1,10 +1,11 @@
 const mongoose = require("mongoose")
-
+//user - kajal123
+// email - kajalg1401@gmail.com
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true,
+        // unique: true,
     },
     email: {
         type: String,
